@@ -5,18 +5,16 @@ import { parseEther, stringToHex } from "viem";
 import { PENNYPRESS_ABI, CONTRACT_ADDRESS } from "@/constants";
 import { useEffect } from "react";
 
-// Mock data for now (Week 2 we fetch this from IPFS/Goldsky)
 interface ArticleProps {
   id: string;
   title: string;
   preview: string;
-  price: string; // e.g., "0.001"
+  price: string;
 }
 
 export default function ArticleCard({ id, title, preview, price }: ArticleProps) {
   const { isConnected } = useAccount();
 
-  // 1. The Write Hook (To send the transaction)
   const { 
     data: hash, 
     writeContract, 
@@ -24,7 +22,6 @@ export default function ArticleCard({ id, title, preview, price }: ArticleProps)
     error: writeError 
   } = useWriteContract();
 
-  // 2. The Wait Hook (To wait for the block confirmation)
   const { 
     isLoading: isConfirming, 
     isSuccess: isConfirmed 
@@ -38,8 +35,6 @@ export default function ArticleCard({ id, title, preview, price }: ArticleProps)
       return;
     }
 
-    // Convert string ID to bytes32 compatible hex
-    // In production, your IDs might already be bytes32
     const contentId = stringToHex(id, { size: 32 });
 
     writeContract({
@@ -47,7 +42,7 @@ export default function ArticleCard({ id, title, preview, price }: ArticleProps)
       abi: PENNYPRESS_ABI,
       functionName: "payToAccess",
       args: [contentId],
-      value: parseEther(price), // Converts "0.001" to Wei
+      value: parseEther(price), 
     });
   };
 
@@ -61,7 +56,6 @@ export default function ArticleCard({ id, title, preview, price }: ArticleProps)
         </p>
       </div>
 
-      {/* Action Section */}
       <div className="flex items-center justify-between mt-6 border-t border-gray-700 pt-4">
         <div className="flex flex-col">
           <span className="text-gray-400 text-xs uppercase tracking-wider">Price</span>
@@ -92,7 +86,6 @@ export default function ArticleCard({ id, title, preview, price }: ArticleProps)
         )}
       </div>
 
-      {/* Error Message */}
       {writeError && (
         <div className="mt-3 text-red-400 text-xs bg-red-900/20 p-2 rounded">
           Error: {writeError.message.split(".")[0]}

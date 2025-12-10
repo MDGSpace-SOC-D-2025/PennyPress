@@ -1,4 +1,5 @@
 import ArticleCard from "@/components/ArticleCard";
+import UploadForm from "@/components/UploadForm";
 
 export default function Home() {
   const articles = [
@@ -19,6 +20,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-950 text-white p-8">
       <div className="max-w-7xl mx-auto">
+        
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
             Latest Articles

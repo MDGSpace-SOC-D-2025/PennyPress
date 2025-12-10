@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xYourDeployedContractAddressHere"; 
+export const CONTRACT_ADDRESS = "0x3caEa4bDcF0D98BcEbEEAD989406b0362924cE79"; 
 
 export const PENNYPRESS_ABI = [
   {

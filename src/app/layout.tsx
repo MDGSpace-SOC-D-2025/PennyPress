@@ -7,7 +7,7 @@ import Header from "@/components/Header"
 
 
 export const metadata: Metadata = {
-  title: "Create Next App",
+  title: "PennyPress",
 };
 
 export default function RootLayout(props:  { children: ReactNode }) {

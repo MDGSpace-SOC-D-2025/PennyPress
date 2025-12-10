@@ -6,16 +6,13 @@ export default function Header() {
     <header className="w-full bg-gray-900 border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left side - Title */}
           <div className="flex items-center">
             <h1 className="text-2xl font-bold text-white">
               PennyPress
             </h1>
           </div>
 
-          {/* Right side - GitHub button and Connect Button */}
           <div className="flex items-center gap-4">
-            {/* GitHub Button */}
             <a
               href="https://github.com/cyfrin/TSender"
               target="_blank"
@@ -26,7 +23,6 @@ export default function Header() {
               <span className="hidden sm:inline">GitHub</span>
             </a>
 
-            {/* Connect Button */}
             <ConnectButton />
           </div>
         </div>
