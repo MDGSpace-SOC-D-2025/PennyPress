@@ -1,96 +1,70 @@
 "use client";
 
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
-import { parseEther, stringToHex } from "viem";
-import { PENNYPRESS_ABI, CONTRACT_ADDRESS } from "@/constants";
-import { useEffect } from "react";
+import ArticleReader from "./ArticleReader";
 
 interface ArticleProps {
-  id: string;
+  id: string;            // The Article ID (e.g., "article-1")
   title: string;
-  preview: string;
-  price: string;
+  preview: string;       // Short description
+  price: string;         // e.g., "0.05"
+  ipfsCid: string;       // <--- NEW: Needed for decryption
+  creatorAddress: string; // <--- NEW: Needed for payment
 }
 
-export default function ArticleCard({ id, title, preview, price }: ArticleProps) {
-  const { isConnected } = useAccount();
-
-  const { 
-    data: hash, 
-    writeContract, 
-    isPending: isWritePending,
-    error: writeError 
-  } = useWriteContract();
-
-  const { 
-    isLoading: isConfirming, 
-    isSuccess: isConfirmed 
-  } = useWaitForTransactionReceipt({
-    hash,
-  });
-
-  const handleUnlock = () => {
-    if (!isConnected) {
-      alert("Please connect your wallet first!");
-      return;
-    }
-
-    const contentId = stringToHex(id, { size: 32 });
-
-    writeContract({
-      address: CONTRACT_ADDRESS,
-      abi: PENNYPRESS_ABI,
-      functionName: "payToAccess",
-      args: [contentId],
-      value: parseEther(price), 
-    });
-  };
+export default function ArticleCard({ 
+  id, 
+  title, 
+  preview, 
+  price, 
+  ipfsCid, 
+  creatorAddress 
+}: ArticleProps) {
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 max-w-md shadow-xl">
-      {/* Header */}
-      <div className="mb-4">
-        <h2 className="text-xl font-bold text-white mb-2">{title}</h2>
-        <p className="text-gray-400 text-sm leading-relaxed">
-          {preview}... <span className="text-gray-600 italic">(content locked)</span>
+    <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 max-w-md shadow-xl flex flex-col h-full">
+      
+      {/* 1. Header Section (Visuals Only) */}
+      <div className="p-6 pb-2 flex-grow">
+        <div className="flex justify-between items-start mb-2">
+          <h2 className="text-xl font-bold text-white leading-tight">{title}</h2>
+          <span className="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">
+             #{id.slice(0, 4)}
+          </span>
+        </div>
+        
+        <p className="text-gray-400 text-sm leading-relaxed mb-4">
+          {preview}
         </p>
+
+        {/* Creator Badge */}
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+           <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-teal-400"></div>
+           <span className="font-mono">
+             By {creatorAddress.slice(0, 6)}...{creatorAddress.slice(-4)}
+           </span>
+        </div>
       </div>
 
-      <div className="flex items-center justify-between mt-6 border-t border-gray-700 pt-4">
-        <div className="flex flex-col">
-          <span className="text-gray-400 text-xs uppercase tracking-wider">Price</span>
-          <span className="text-emerald-400 font-mono font-bold">{price} ETH</span>
+      {/* 2. The Logic Section (Delegated to Reader) */}
+      {/* This component will automatically decide if it should show:
+          A. The "Buy" Button (if locked)
+          B. The "Decrypt" Button (if paid)
+          C. The PDF Viewer (if decrypted) 
+      */}
+      <div className="bg-gray-900/50 border-t border-gray-700 p-4">
+        <div className="flex justify-between items-center mb-4 px-2">
+           <span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Price</span>
+           <span className="text-emerald-400 font-mono font-bold text-lg">{price} ETH</span>
         </div>
 
-        {isConfirmed ? (
-          <button 
-            disabled 
-            className="bg-emerald-500/20 text-emerald-400 px-6 py-2 rounded-lg font-medium border border-emerald-500/50"
-          >
-            Unlocked! 🔓
-          </button>
-        ) : (
-          <button
-            onClick={handleUnlock}
-            disabled={isWritePending || isConfirming}
-            className={`
-              px-6 py-2 rounded-lg font-medium transition-all duration-200
-              ${isWritePending || isConfirming 
-                ? "bg-gray-600 cursor-not-allowed text-gray-300"
-                : "bg-blue-600 hover:bg-blue-500 text-white shadow-lg hover:shadow-blue-500/20"
-              }
-            `}
-          >
-            {isWritePending ? "Check Wallet..." : isConfirming ? "Confirming..." : "Unlock Now 🔒"}
-          </button>
-        )}
+        <ArticleReader 
+          articleId={id}
+          price={price}
+          ipfsCid={ipfsCid}
+          creatorAddress={creatorAddress}
+        />
       </div>
 
-      {writeError && (
-        <div className="mt-3 text-red-400 text-xs bg-red-900/20 p-2 rounded">
-          Error: {writeError.message.split(".")[0]}
-        </div>
-      )}
     </div>
   );
 }
