@@ -1,0 +1,14 @@
+{
+  "name": "penny-press",
+  "license": "UNLICENSED",
+  "version": "1.0.0",
+  "scripts": {
+    "codegen": "goldsky subgraph codegen",
+    "build": "goldsky subgraph build",
+    "deploy": "goldsky subgraph deploy penny-press/1.0.0"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.68.0",
+    "@graphprotocol/graph-ts": "^0.32.0"
+  }
+}

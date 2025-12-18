@@ -1,0 +1,8 @@
+type Article @entity {
+  id: ID!
+  ipfsCid: String!
+  price: BigInt!
+  creator: Bytes!
+  ownerCount: Int!
+  createdAt: BigInt!
+}

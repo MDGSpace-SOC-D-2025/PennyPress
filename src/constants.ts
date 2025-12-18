@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x6b2c569554599249732fdA6F3D81B2F4724Ef2f0"; 
+export const CONTRACT_ADDRESS = "0x855EFbf9350214a472BE2DB44B98F8D8A9c7800e"; 
 
 export const PENNYPRESS_ABI = [
   // 1. The Register Function (This was missing!)
@@ -7,7 +7,8 @@ export const PENNYPRESS_ABI = [
     "name": "registerArticle",
     "inputs": [
       { "name": "articleId", "type": "bytes32", "internalType": "bytes32" },
-      { "name": "price", "type": "uint256", "internalType": "uint256" }
+      { "name": "price", "type": "uint256", "internalType": "uint256" },
+      { "name": "ipfsCid", "type": "string", "internalType": "string" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -25,7 +26,7 @@ export const PENNYPRESS_ABI = [
   // 3. The Check Function (For reading access)
   {
     "type": "function",
-    "name": "hasAccess",
+    "name": "checkAccess",
     "inputs": [
       { "name": "articleId", "type": "bytes32", "internalType": "bytes32" },
       { "name": "user", "type": "address", "internalType": "address" }

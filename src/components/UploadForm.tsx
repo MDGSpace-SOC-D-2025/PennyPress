@@ -74,7 +74,7 @@ export default function UploadForm() {
       address: CONTRACT_ADDRESS,
       abi: PENNYPRESS_ABI,
       functionName: "registerArticle",
-      args: [articleId, parseEther(price)],
+      args: [articleId, parseEther(price), ipfsCid],
     });
   };
 

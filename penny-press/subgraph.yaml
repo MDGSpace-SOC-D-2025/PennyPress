@@ -1,0 +1,26 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: PennyPress
+    network: zksync-era-sepolia
+    source:
+      address: "0x855EFbf9350214a472BE2DB44B98F8D8A9c7800e"
+      abi: PennyPress
+      startBlock: 6290900
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Article
+      abis:
+        - name: PennyPress
+          file: ./abis/PennyPress.json
+      eventHandlers:
+        - event: ArticleRegistered(indexed bytes32,string,indexed address,uint256)
+          handler: handleArticleRegistered
+        - event: AccessGranted(indexed bytes32,indexed address)
+          handler: handleAccessGranted
+      file: ./src/penny-press.ts

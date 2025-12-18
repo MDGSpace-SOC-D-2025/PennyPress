@@ -20,7 +20,7 @@ export default function ArticleReader({ articleId, price, ipfsCid, creatorAddres
   const { data: hasAccess } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: PENNYPRESS_ABI,
-    functionName: "hasAccess",
+    functionName: "checkAccess",
     args: [articleId.startsWith("0x") ? (articleId as `0x${string}`): toHex(articleId),
 
         address as `0x${string}`
