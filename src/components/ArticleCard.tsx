@@ -1,27 +1,49 @@
 import React from "react";
-import 'bootstrap/dist/css/bootstrap.css';
+import { formatEther } from "viem";
 
-const ArticleCard = ({ article } : {article: any}) => {
+const ArticleCard = ({ article }: { article: any }) => {
   return (
-    <>
-      <div className="card h-100 shadow-sm">
-      <div className="card-body d-flex flex-column">
-        <h5 className="card-title">{article.title}</h5>
-        <h6 className="card-subtitle mb-2 text-muted">
-          By {article.author}
-        </h6>
-        <p className="card-text">
-          {article.summary}
+    <div className="card h-100">
+      <div className="card-body d-flex flex-column p-4">
+
+        {/* TOP ROW: Tag & Price */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <span className="badge rounded-pill px-3 fw-bold" style={{backgroundColor: 'var(--text-off-white)', color: 'var(--navy-bg)'}}>
+            Article
+          </span>
+          {/* THEME UPDATE: Use new text-accent class */}
+          <span className="text-accent fw-bold fs-5 font-monospace">
+            {formatEther(BigInt(article.price))} ETH
+          </span>
+        </div>
+
+        {/* TITLE */}
+        <h4 className="card-title fw-bold text-white mb-2" style={{ letterSpacing: '-0.5px' }}>
+            {article.title}
+        </h4>
+
+        {/* CREATOR */}
+        {/* THEME UPDATE: Use new text-muted-blue class */}
+        <p className="card-subtitle text-muted-blue small mb-4 font-monospace">
+          By {article.creator.slice(0, 6)}...{article.creator.slice(-4)}
         </p>
-        <button className="btn btn-primary mt-auto">
-          Read Article
-        </button>
-      </div>
-      <div className="card-footer text-muted">
-        <small>Category Tag</small>
+
+        {/* DESCRIPTION */}
+        <p className="card-text text-white text-opacity-75 flex-grow-1 mb-4">
+          {article.description?.length > 100
+            ? article.description.substring(0, 100) + "..."
+            : article.description}
+        </p>
+
+        {/* BUTTON */}
+        <div className="mt-auto">
+          <button className="btn btn-primary w-100 shadow-sm">
+            Read Now
+          </button>
+        </div>
+
       </div>
     </div>
-    </>
   );
 };
 

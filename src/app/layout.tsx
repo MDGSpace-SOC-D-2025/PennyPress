@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "./globals.css";
 import { type ReactNode } from "react";
 import { Providers } from "./providers";
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout(props:  { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-[#121212] text-white">
         <Providers>
           <Header/>
           {props.children}

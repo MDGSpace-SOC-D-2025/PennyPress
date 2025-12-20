@@ -1,50 +1,49 @@
 "use client";
 import { useState } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { parseEther, stringToHex, keccak256, toHex } from "viem";
+import { parseEther, stringToHex, keccak256 } from "viem";
 import { lit } from "@/utils/lit";
 import { PENNYPRESS_ABI, CONTRACT_ADDRESS } from "@/constants";
 
 export default function UploadForm() {
   const { address } = useAccount();
   
-  // Form State
+  // --- STATE ---
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("0.05");
   
-  // System State
   const [status, setStatus] = useState("");
   const [ipfsCid, setIpfsCid] = useState("");
 
-  // Blockchain Hook
+  // --- BLOCKCHAIN HOOKS ---
   const { data: hash, writeContract, isPending } = useWriteContract();
   
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   });
 
-  // Step 1: Encrypt & Upload to IPFS
+  // --- LOGIC 1: IPFS UPLOAD ---
   const handleUploadToIPFS = async () => {
     if (!file) return;
     setStatus("Encrypting & Uploading...");
 
     try {
-      // A. Encrypt
+      // 1. Encrypt the file using Lit Protocol
       const encryptedData = await lit.encryptFile(file);
       
-      // B. Create Bundle
+      // 2. Prepare the bundle
       const contentBundle = JSON.stringify({
-        title,           // Store title in IPFS for easy retrieval later
-        description,     // Store desc in IPFS
+        title,          
+        description,    
         ciphertext: encryptedData.ciphertext,
         dataToEncryptHash: encryptedData.dataToEncryptHash,
         accessControlConditions: encryptedData.accessControlConditions,
         fileType: file.type 
       });
 
-      // C. Upload
+      // 3. Upload to IPFS via your API route
       const blob = new Blob([contentBundle], { type: 'application/json' });
       const formData = new FormData();
       formData.append("file", blob, "content.json");
@@ -62,13 +61,12 @@ export default function UploadForm() {
     }
   };
 
-  // Step 2: Register on Blockchain
+  // --- LOGIC 2: BLOCKCHAIN REGISTER ---
   const handleRegister = () => {
     if (!ipfsCid || !title) return;
 
-    // Generate a unique ID based on the IPFS CID (This ensures 1-to-1 mapping)
-    // We convert the string CID to a 32-byte hex string
-    const articleId = keccak256(toHex(ipfsCid));
+    // Create unique ID from the IPFS CID
+    const articleId = keccak256(stringToHex(ipfsCid));
 
     writeContract({
       address: CONTRACT_ADDRESS,
@@ -78,63 +76,78 @@ export default function UploadForm() {
     });
   };
 
+  // --- STYLES ---
+  const inputStyles = {
+    backgroundColor: 'var(--navy-bg)',
+    color: 'var(--text-off-white)',
+    borderColor: 'var(--navy-border)',
+    borderRadius: '8px',
+    padding: '12px'
+  };
+
+  // --- RENDER ---
   return (
-    <div className="w-full max-w-xl bg-gray-900 border border-gray-800 rounded-xl p-8 shadow-2xl">
-      
+    <div className="card w-100 p-4 shadow-lg" style={{maxWidth: '600px'}}>
+
       {/* SECTION 1: Details */}
-      <div className="space-y-4 mb-6">
-        <div>
-          <label className="text-xs text-gray-500 uppercase">Title</label>
+      <div className="mb-4">
+        <div className="mb-3">
+          <label className="text-accent text-uppercase small fw-bold mb-1" style={{letterSpacing: '1px'}}>Title</label>
           <input 
             type="text" 
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full bg-black border border-gray-700 rounded p-3 text-white focus:border-blue-500 outline-none"
+            className="form-control"
+            style={inputStyles}
             placeholder="e.g., The Future of AI"
           />
         </div>
         
-        <div>
-          <label className="text-xs text-gray-500 uppercase">Description</label>
+        <div className="mb-3">
+          <label className="text-accent text-uppercase small fw-bold mb-1" style={{letterSpacing: '1px'}}>Description</label>
           <textarea 
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-black border border-gray-700 rounded p-3 text-white focus:border-blue-500 outline-none h-24"
+            className="form-control"
+            style={{ ...inputStyles, height: '100px' }}
             placeholder="A short summary..."
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-             <label className="text-xs text-gray-500 uppercase">Price (ETH)</label>
+        <div className="row g-3">
+          <div className="col-6">
+             <label className="text-accent text-uppercase small fw-bold mb-1" style={{letterSpacing: '1px'}}>Price (ETH)</label>
              <input 
                type="number" 
                step="0.001" 
                value={price}
                onChange={(e) => setPrice(e.target.value)}
-               className="w-full bg-black border border-gray-700 rounded p-3 text-white"
+               className="form-control"
+               style={inputStyles}
              />
           </div>
-          <div>
-            <label className="text-xs text-gray-500 uppercase">File</label>
+          <div className="col-6">
+            <label className="text-accent text-uppercase small fw-bold mb-1" style={{letterSpacing: '1px'}}>File</label>
             <input 
               type="file" 
               onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="w-full text-sm text-gray-400 file:mr-2 file:py-2 file:px-4 file:rounded-full file:bg-gray-800 file:text-white"
+              className="form-control"
+              style={{ ...inputStyles, padding: '9px' }}
             />
           </div>
         </div>
       </div>
 
       {/* SECTION 2: Actions */}
-      <div className="space-y-3">
+      <div className="d-flex flex-column gap-3">
         {/* Button A: Upload to IPFS */}
         <button 
           onClick={handleUploadToIPFS}
           disabled={!file || !!ipfsCid || status.includes("Encrypting")}
-          className={`w-full py-3 rounded-lg font-bold transition-all ${ipfsCid ? 'bg-green-900/30 text-green-400' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
+          className={`btn ${ipfsCid ? 'btn-success' : 'btn-outline-primary'} w-100 py-3 fw-bold`}
+          style={{ borderRadius: '12px', textTransform: 'uppercase' }}
         >
-          {ipfsCid ? "✓ File Uploaded to IPFS" : status || "1. Upload & Encrypt"}
+          {ipfsCid ? "✓ File Encrypted & Uploaded" : status || "1. Upload & Encrypt"}
         </button>
 
         {/* Button B: Register on Chain */}
@@ -142,18 +155,19 @@ export default function UploadForm() {
           <button 
             onClick={handleRegister}
             disabled={isPending || isConfirming || isConfirmed}
-            className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-lg font-bold transition-all"
+            className="btn btn-primary w-100 py-3 fw-bold"
+            style={{ borderRadius: '12px', textTransform: 'uppercase', boxShadow: '0 0 15px rgba(255, 215, 0, 0.3)' }}
           >
-            {isPending ? "Open Wallet..." : isConfirming ? "Confirming..." : isConfirmed ? "Published! 🎉" : "2. Publish to Blockchain"}
+            {isPending ? "Check Wallet..." : isConfirming ? "Confirming..." : isConfirmed ? "Published! 🎉" : "2. Publish to Blockchain"}
           </button>
         )}
       </div>
 
       {/* Confirmation Link */}
       {isConfirmed && (
-        <div className="mt-4 p-4 bg-green-900/20 border border-green-900 rounded text-center">
-          <p className="text-green-400">Success! Article Registered.</p>
-          <p className="text-xs text-gray-500 mt-1">Tx Hash: {hash?.slice(0,10)}...</p>
+        <div className="mt-4 p-3 border border-success rounded text-center" style={{ backgroundColor: 'rgba(25, 135, 84, 0.1)' }}>
+          <p className="text-success fw-bold mb-1">Success! Article Registered.</p>
+          <p className="small text-muted-blue mb-0">Tx: {hash?.slice(0,10)}...</p>
         </div>
       )}
     </div>

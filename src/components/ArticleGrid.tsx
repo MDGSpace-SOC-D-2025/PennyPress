@@ -1,28 +1,49 @@
-import React from "react";
-import 'bootstrap/dist/css/bootstrap.css';
+"use client";
+import React, { useState, useEffect } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure min.css is used
 import ArticleCard from "./ArticleCard";
+import { loadArticles, ArticleData } from "./ArticleReader";
 
-const DummyArticles = [
-  { id: 1, title: "Article 1", summary: "Summary of Article 1", author: "Author 1" },
-  { id: 2, title: "Article 2", summary: "Summary of Article 2", author: "Author 2" },
-  { id: 3, title: "Article 3", summary: "Summary of Article 3", author: "Author 3" },
-  { id: 4, title: "Article 4", summary: "Summary of Article 4", author: "Author 4" },
-];
+export default function ArticleGrid() {
+  const [articles, setArticles] = useState<ArticleData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const ArticleGrid = () => {
+  useEffect(() => {
+    const init = async () => {
+      const data = await loadArticles();
+      setArticles(data);
+      setLoading(false);
+    };
+    init();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="spinner-border text-primary" role="status"></div>
+      </div>
+    );
+  }
+
+  if (articles.length === 0) {
+    return (
+      <div className="text-center text-white py-5">
+        <h3>No articles found.</h3>
+      </div>
+    );
+  }
+
   return (
-    <div>  
-      <div className="container-fluid py-5">
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {DummyArticles.map((article) => (
-                <div className="col" key={article.id}>
-                    <ArticleCard article ={article}/>
-                </div>
-            ))}
-        </div>
+    <div className="container py-5">
+      {/* The 'row' class is essential for the grid system */}
+      <div className="row g-4"> 
+        {articles.map((article) => (
+          /* FIX: Explicitly set column width for different screens */
+          <div className="col-12 col-md-6 col-lg-4" key={article.id}>
+            <ArticleCard article={article} />
+          </div>
+        ))}
       </div>
     </div>
   );
 }
-
-export default ArticleGrid;
