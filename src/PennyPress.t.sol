@@ -22,7 +22,7 @@ contract PennyPressTest is Test{
         pennyPress = new PennyPress();
 
     }
-
+    
     function testRegisterArticle() public{
         bytes32 testArticleId = keccak256("TestArticleId");
         uint256 testPrice = 0.1 ether;
