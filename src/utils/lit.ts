@@ -4,11 +4,9 @@ import { encryptFile, decryptToFile } from "@lit-protocol/encryption";
 
 class Lit {
   public litNodeClient: LitNodeClient | null = null;
-  // We keep a reference to the specific chain we are using for signatures
-  private chain = "ethereum"; 
+  private chain = "ethereum";
 
   async connect() {
-    // Prevent reconnecting if already connected
     if (this.litNodeClient) return;
 
     const client = new LitNodeClient({
@@ -26,15 +24,12 @@ class Lit {
       await this.connect();
     }
 
-    // 1. Get the User's Signature (AuthSig)
     const authSig = await checkAndSignAuthMessage({
       chain: this.chain,
       nonce: await this.litNodeClient!.getLatestBlockhash(),
     });
 
-    // 2. Define Access Control Conditions (The Rule)
-    // TODO: Week 3 - We will change this to check your zkSync contract!
-    // Current Rule: "User must have >= 0 ETH on Ethereum" (Allows everyone for testing)
+    // Access Control: Allow anyone (for dev purposes)
     const accessControlConditions = [
       {
         contractAddress: "",
@@ -49,7 +44,6 @@ class Lit {
       },
     ];
 
-    // 3. Encrypt the file
     const { ciphertext, dataToEncryptHash } = await encryptFile(
       {
         file,
@@ -68,13 +62,13 @@ class Lit {
   }
 
   // --- 2. DECRYPTION (Read) ---
-  // THIS WAS MISSING
   async decryptFile(
     ciphertext: string,
     dataToEncryptHash: string,
     accessControlConditions: any[],
-    fileType: string
-  ) {
+    fileType: string 
+  ): Promise<Blob> {
+    
     if (!this.litNodeClient) {
       await this.connect();
     }
@@ -95,8 +89,7 @@ class Lit {
       this.litNodeClient!
     );
 
-    // FIX IS HERE: Cast to 'any' to satisfy TypeScript
-    // The browser knows how to handle this Uint8Array perfectly fine.
+    // FIX: Cast 'decryptedData' to 'any' to bypass the 'ArrayBufferLike' mismatch
     return new Blob([decryptedData as any], { type: fileType });
   }
 }
