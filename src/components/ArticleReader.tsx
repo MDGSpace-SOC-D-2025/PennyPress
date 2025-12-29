@@ -45,7 +45,6 @@ export const loadArticles = async (): Promise<ArticleData[]> => {
 
     const result = await response.json();
 
-    // 4. PROCESS IPFS (Parallel)
     const enrichedArticles = await Promise.all(
       result.data.articles.map(async (article: any) => {
         const metadata = await fetchIPFSMetadata(article.ipfsCid);
