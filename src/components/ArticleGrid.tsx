@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure min.css is used
+import 'bootstrap/dist/css/bootstrap.min.css'; 
 import ArticleCard from "./ArticleCard";
 import { loadArticles, ArticleData } from "./ArticleReader";
 
@@ -35,10 +35,8 @@ export default function ArticleGrid() {
 
   return (
     <div className="container py-5">
-      {/* The 'row' class is essential for the grid system */}
       <div className="row g-4"> 
         {articles.map((article) => (
-          /* FIX: Explicitly set column width for different screens */
           <div className="col-12 col-md-6 col-lg-4" key={article.id}>
             <ArticleCard article={article} />
           </div>
