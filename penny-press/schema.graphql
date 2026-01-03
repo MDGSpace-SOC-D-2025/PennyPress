@@ -5,4 +5,5 @@ type Article @entity {
   creator: Bytes!
   ownerCount: Int!
   createdAt: BigInt!
+  totalStaked: BigInt!
 }

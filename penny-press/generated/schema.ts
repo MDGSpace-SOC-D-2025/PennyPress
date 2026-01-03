@@ -114,4 +114,17 @@ export class Article extends Entity {
   set createdAt(value: BigInt) {
     this.set("createdAt", Value.fromBigInt(value));
   }
+
+  get totalStaked(): BigInt {
+    let value = this.get("totalStaked");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set totalStaked(value: BigInt) {
+    this.set("totalStaked", Value.fromBigInt(value));
+  }
 }

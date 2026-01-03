@@ -1,12 +1,12 @@
 specVersion: 0.0.5
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: PennyPress
     network: zksync-era-sepolia
     source:
-      address: "0x855EFbf9350214a472BE2DB44B98F8D8A9c7800e"
+      address: "0xD3dfbA35e02447418C544d488eFE01a6F719Fc33"
       abi: PennyPress
       startBlock: 6290900
     mapping:
@@ -23,4 +23,7 @@ dataSources:
           handler: handleArticleRegistered
         - event: AccessGranted(indexed bytes32,indexed address)
           handler: handleAccessGranted
+        - event: Staked(indexed bytes32,indexed address,uint256)
+          handler: handleStaked
+      
       file: ./src/penny-press.ts

@@ -1,13 +1,17 @@
-const API_URL = "https://api.goldsky.com/api/public/project_cmj877hvmkci001sf83v915vv/subgraphs/penny-press/1.0.0/gn";
+const API_URL = "https://api.goldsky.com/api/public/project_cmj877hvmkci001sf83v915vv/subgraphs/pennypress/1.0.3/gn";
 
 const GRAPHQL_QUERY = `
   query {
-    articles(first: 20, orderBy: createdAt, orderDirection: desc) {
+    articles(
+      first: 50
+      orderBy: totalStaked    
+      orderDirection: desc    
+    ) {
       id
       ipfsCid
       price
       creator
-      createdAt
+      totalStaked    
     }
   }
 `;
@@ -19,6 +23,7 @@ export interface ArticleData {
   title: string;
   description: string;
   ipfsCid: string;
+
 }
 
 const fetchIPFSMetadata = async (cid: string) => {
@@ -55,6 +60,7 @@ export const loadArticles = async (): Promise<ArticleData[]> => {
           price: article.price, 
           ipfsCid: article.ipfsCid,
           blockTimestamp: article.createdAt,
+          totalStaked: article.totalStaked,
           title: metadata.title || "Untitled",
           description: metadata.description || "",
         };

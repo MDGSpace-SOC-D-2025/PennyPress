@@ -10,6 +10,28 @@ import {
   BigInt,
 } from "@graphprotocol/graph-ts";
 
+export class AccessGranted extends ethereum.Event {
+  get params(): AccessGranted__Params {
+    return new AccessGranted__Params(this);
+  }
+}
+
+export class AccessGranted__Params {
+  _event: AccessGranted;
+
+  constructor(event: AccessGranted) {
+    this._event = event;
+  }
+
+  get articleId(): Bytes {
+    return this._event.parameters[0].value.toBytes();
+  }
+
+  get user(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
 export class ArticleRegistered extends ethereum.Event {
   get params(): ArticleRegistered__Params {
     return new ArticleRegistered__Params(this);
@@ -40,16 +62,38 @@ export class ArticleRegistered__Params {
   }
 }
 
-export class AccessGranted extends ethereum.Event {
-  get params(): AccessGranted__Params {
-    return new AccessGranted__Params(this);
+export class OwnershipTransferred extends ethereum.Event {
+  get params(): OwnershipTransferred__Params {
+    return new OwnershipTransferred__Params(this);
   }
 }
 
-export class AccessGranted__Params {
-  _event: AccessGranted;
+export class OwnershipTransferred__Params {
+  _event: OwnershipTransferred;
 
-  constructor(event: AccessGranted) {
+  constructor(event: OwnershipTransferred) {
+    this._event = event;
+  }
+
+  get previousOwner(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newOwner(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class Staked extends ethereum.Event {
+  get params(): Staked__Params {
+    return new Staked__Params(this);
+  }
+}
+
+export class Staked__Params {
+  _event: Staked;
+
+  constructor(event: Staked) {
     this._event = event;
   }
 
@@ -57,14 +101,87 @@ export class AccessGranted__Params {
     return this._event.parameters[0].value.toBytes();
   }
 
-  get user(): Address {
+  get staker(): Address {
     return this._event.parameters[1].value.toAddress();
+  }
+
+  get amount(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
 export class PennyPress extends ethereum.SmartContract {
   static bind(address: Address): PennyPress {
     return new PennyPress("PennyPress", address);
+  }
+
+  articleCreators(param0: Bytes): Address {
+    let result = super.call(
+      "articleCreators",
+      "articleCreators(bytes32):(address)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_articleCreators(param0: Bytes): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "articleCreators",
+      "articleCreators(bytes32):(address)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  articlePrices(param0: Bytes): BigInt {
+    let result = super.call(
+      "articlePrices",
+      "articlePrices(bytes32):(uint256)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_articlePrices(param0: Bytes): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "articlePrices",
+      "articlePrices(bytes32):(uint256)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  articleRewardPool(param0: Bytes): BigInt {
+    let result = super.call(
+      "articleRewardPool",
+      "articleRewardPool(bytes32):(uint256)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_articleRewardPool(param0: Bytes): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "articleRewardPool",
+      "articleRewardPool(bytes32):(uint256)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   checkAccess(articleId: Bytes, user: Address): boolean {
@@ -97,6 +214,302 @@ export class PennyPress extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  creatorBalances(param0: Address): BigInt {
+    let result = super.call(
+      "creatorBalances",
+      "creatorBalances(address):(uint256)",
+      [ethereum.Value.fromAddress(param0)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_creatorBalances(param0: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "creatorBalances",
+      "creatorBalances(address):(uint256)",
+      [ethereum.Value.fromAddress(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  creatorsToPay(param0: BigInt): Address {
+    let result = super.call(
+      "creatorsToPay",
+      "creatorsToPay(uint256):(address)",
+      [ethereum.Value.fromUnsignedBigInt(param0)],
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_creatorsToPay(param0: BigInt): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "creatorsToPay",
+      "creatorsToPay(uint256):(address)",
+      [ethereum.Value.fromUnsignedBigInt(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  hasAccess(param0: Bytes, param1: Address): boolean {
+    let result = super.call("hasAccess", "hasAccess(bytes32,address):(bool)", [
+      ethereum.Value.fromFixedBytes(param0),
+      ethereum.Value.fromAddress(param1),
+    ]);
+
+    return result[0].toBoolean();
+  }
+
+  try_hasAccess(param0: Bytes, param1: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "hasAccess",
+      "hasAccess(bytes32,address):(bool)",
+      [
+        ethereum.Value.fromFixedBytes(param0),
+        ethereum.Value.fromAddress(param1),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  isWaitingForPay(param0: Address): boolean {
+    let result = super.call(
+      "isWaitingForPay",
+      "isWaitingForPay(address):(bool)",
+      [ethereum.Value.fromAddress(param0)],
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_isWaitingForPay(param0: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "isWaitingForPay",
+      "isWaitingForPay(address):(bool)",
+      [ethereum.Value.fromAddress(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  owner(): Address {
+    let result = super.call("owner", "owner():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_owner(): ethereum.CallResult<Address> {
+    let result = super.tryCall("owner", "owner():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  totalStakedOnArticle(param0: Bytes): BigInt {
+    let result = super.call(
+      "totalStakedOnArticle",
+      "totalStakedOnArticle(bytes32):(uint256)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_totalStakedOnArticle(param0: Bytes): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "totalStakedOnArticle",
+      "totalStakedOnArticle(bytes32):(uint256)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  treasuryBalance(): BigInt {
+    let result = super.call(
+      "treasuryBalance",
+      "treasuryBalance():(uint256)",
+      [],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_treasuryBalance(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "treasuryBalance",
+      "treasuryBalance():(uint256)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  userStakes(param0: Bytes, param1: Address): BigInt {
+    let result = super.call(
+      "userStakes",
+      "userStakes(bytes32,address):(uint256)",
+      [
+        ethereum.Value.fromFixedBytes(param0),
+        ethereum.Value.fromAddress(param1),
+      ],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_userStakes(param0: Bytes, param1: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "userStakes",
+      "userStakes(bytes32,address):(uint256)",
+      [
+        ethereum.Value.fromFixedBytes(param0),
+        ethereum.Value.fromAddress(param1),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+}
+
+export class ConstructorCall extends ethereum.Call {
+  get inputs(): ConstructorCall__Inputs {
+    return new ConstructorCall__Inputs(this);
+  }
+
+  get outputs(): ConstructorCall__Outputs {
+    return new ConstructorCall__Outputs(this);
+  }
+}
+
+export class ConstructorCall__Inputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
+    this._call = call;
+  }
+}
+
+export class ConstructorCall__Outputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
+    this._call = call;
+  }
+}
+
+export class ClaimRewardsCall extends ethereum.Call {
+  get inputs(): ClaimRewardsCall__Inputs {
+    return new ClaimRewardsCall__Inputs(this);
+  }
+
+  get outputs(): ClaimRewardsCall__Outputs {
+    return new ClaimRewardsCall__Outputs(this);
+  }
+}
+
+export class ClaimRewardsCall__Inputs {
+  _call: ClaimRewardsCall;
+
+  constructor(call: ClaimRewardsCall) {
+    this._call = call;
+  }
+
+  get articleId(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+}
+
+export class ClaimRewardsCall__Outputs {
+  _call: ClaimRewardsCall;
+
+  constructor(call: ClaimRewardsCall) {
+    this._call = call;
+  }
+}
+
+export class DistributeCreatorIncomeCall extends ethereum.Call {
+  get inputs(): DistributeCreatorIncomeCall__Inputs {
+    return new DistributeCreatorIncomeCall__Inputs(this);
+  }
+
+  get outputs(): DistributeCreatorIncomeCall__Outputs {
+    return new DistributeCreatorIncomeCall__Outputs(this);
+  }
+}
+
+export class DistributeCreatorIncomeCall__Inputs {
+  _call: DistributeCreatorIncomeCall;
+
+  constructor(call: DistributeCreatorIncomeCall) {
+    this._call = call;
+  }
+}
+
+export class DistributeCreatorIncomeCall__Outputs {
+  _call: DistributeCreatorIncomeCall;
+
+  constructor(call: DistributeCreatorIncomeCall) {
+    this._call = call;
+  }
+}
+
+export class PayToAccessCall extends ethereum.Call {
+  get inputs(): PayToAccessCall__Inputs {
+    return new PayToAccessCall__Inputs(this);
+  }
+
+  get outputs(): PayToAccessCall__Outputs {
+    return new PayToAccessCall__Outputs(this);
+  }
+}
+
+export class PayToAccessCall__Inputs {
+  _call: PayToAccessCall;
+
+  constructor(call: PayToAccessCall) {
+    this._call = call;
+  }
+
+  get articleId(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+}
+
+export class PayToAccessCall__Outputs {
+  _call: PayToAccessCall;
+
+  constructor(call: PayToAccessCall) {
+    this._call = call;
   }
 }
 
@@ -138,20 +551,46 @@ export class RegisterArticleCall__Outputs {
   }
 }
 
-export class PayToAccessCall extends ethereum.Call {
-  get inputs(): PayToAccessCall__Inputs {
-    return new PayToAccessCall__Inputs(this);
+export class RenounceOwnershipCall extends ethereum.Call {
+  get inputs(): RenounceOwnershipCall__Inputs {
+    return new RenounceOwnershipCall__Inputs(this);
   }
 
-  get outputs(): PayToAccessCall__Outputs {
-    return new PayToAccessCall__Outputs(this);
+  get outputs(): RenounceOwnershipCall__Outputs {
+    return new RenounceOwnershipCall__Outputs(this);
   }
 }
 
-export class PayToAccessCall__Inputs {
-  _call: PayToAccessCall;
+export class RenounceOwnershipCall__Inputs {
+  _call: RenounceOwnershipCall;
 
-  constructor(call: PayToAccessCall) {
+  constructor(call: RenounceOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class RenounceOwnershipCall__Outputs {
+  _call: RenounceOwnershipCall;
+
+  constructor(call: RenounceOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class StakeCall extends ethereum.Call {
+  get inputs(): StakeCall__Inputs {
+    return new StakeCall__Inputs(this);
+  }
+
+  get outputs(): StakeCall__Outputs {
+    return new StakeCall__Outputs(this);
+  }
+}
+
+export class StakeCall__Inputs {
+  _call: StakeCall;
+
+  constructor(call: StakeCall) {
     this._call = call;
   }
 
@@ -160,10 +599,40 @@ export class PayToAccessCall__Inputs {
   }
 }
 
-export class PayToAccessCall__Outputs {
-  _call: PayToAccessCall;
+export class StakeCall__Outputs {
+  _call: StakeCall;
 
-  constructor(call: PayToAccessCall) {
+  constructor(call: StakeCall) {
+    this._call = call;
+  }
+}
+
+export class TransferOwnershipCall extends ethereum.Call {
+  get inputs(): TransferOwnershipCall__Inputs {
+    return new TransferOwnershipCall__Inputs(this);
+  }
+
+  get outputs(): TransferOwnershipCall__Outputs {
+    return new TransferOwnershipCall__Outputs(this);
+  }
+}
+
+export class TransferOwnershipCall__Inputs {
+  _call: TransferOwnershipCall;
+
+  constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+
+  get newOwner(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class TransferOwnershipCall__Outputs {
+  _call: TransferOwnershipCall;
+
+  constructor(call: TransferOwnershipCall) {
     this._call = call;
   }
 }

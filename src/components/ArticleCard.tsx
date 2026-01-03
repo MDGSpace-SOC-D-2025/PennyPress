@@ -1,6 +1,7 @@
 import React from "react";
 import { formatEther } from "viem";
 import ReadButton from "./ReadButton";
+import StakeButton from "./StakeButton";
 
 const ArticleCard = ({ article }: { article: any }) => {
   return (
@@ -10,10 +11,10 @@ const ArticleCard = ({ article }: { article: any }) => {
         {/* HEADER */}
         <div className="d-flex justify-content-between align-items-center mb-3">
           <span className="badge rounded-pill px-3 fw-bold" style={{backgroundColor: 'var(--text-off-white)', color: 'var(--navy-bg)'}}>
-            Article
+            {formatEther(BigInt(article.totalStaked))} ETH Staked
           </span>
           <span className="text-accent fw-bold fs-5 font-monospace">
-            {formatEther(BigInt(article.price))} ETH
+            Price: {formatEther(BigInt(article.price))} ETH
           </span>
         </div>
 
@@ -43,7 +44,9 @@ const ArticleCard = ({ article }: { article: any }) => {
                 creator={article.creator}
             />
         </div>
-
+        <div className="mt-2">
+            <StakeButton articleId={article.id} />
+        </div>
       </div>
     </div>
   );
