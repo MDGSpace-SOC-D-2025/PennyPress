@@ -1,4 +1,4 @@
-const API_URL = "https://api.goldsky.com/api/public/project_cmj877hvmkci001sf83v915vv/subgraphs/pennypress/1.1.0/gn"; 
+const API_URL = "https://api.goldsky.com/api/public/project_cmj877hvmkci001sf83v915vv/subgraphs/pennypress/1.1.1/gn"; 
 
 const GRAPHQL_QUERY = `
   query GetArticles($orderBy: Article_orderBy, $orderDirection: OrderDirection) {

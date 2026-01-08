@@ -70,7 +70,7 @@ contract PennyPress is ReentrancyGuard, Ownable {
     function stake(bytes32 articleId) external payable nonReentrant {
         require(msg.value > 0, "Cannot stake 0");
         
-        uint256 cap = (articlePrices[articleId])/10;
+        uint256 cap = (articlePrices[articleId]) * 10;
         require(totalStakedOnArticle[articleId] + msg.value <= cap, "Cap reached");
 
         userStakes[articleId][msg.sender] += msg.value;

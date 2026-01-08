@@ -9,14 +9,13 @@ const ArticleCard = ({ article }: { article: ArticleData }) => {
   return (
     <div className="card h-100 border-0 shadow-sm" style={{ backgroundColor: '#1e293b' }}>
       <div className="card-body d-flex flex-column p-4">
-
         <div className="d-flex justify-content-between align-items-center mb-3">
           <span className="badge rounded-pill px-3 py-2 fw-bold" 
                 style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#cbd5e1' }}>
-            {formatEther(BigInt(article.totalStaked))} ETH Staked
+            {formatEther(BigInt(article.totalStaked) * BigInt(10000))} PT Staked
           </span>
           <span className="fw-bold font-monospace" style={{ color: '#64ffda' }}>
-            {formatEther(BigInt(article.price))} ETH
+            Price: {formatEther(BigInt(article.price) * BigInt(10000))} PT
           </span>
         </div>
 

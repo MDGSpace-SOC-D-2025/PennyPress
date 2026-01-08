@@ -6,23 +6,11 @@ export default function Home() {
     <main className="min-vh-100 d-flex flex-column align-items-center justify-content-center p-4">
 
       {/* TITLE */}
-      <h1
-        className="display-3 fw-bold mb-5 text-center"
-        style={{
-          background: "linear-gradient(to right, var(--yellow-accent), #FFE57F, var(--yellow-accent))",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundSize: "200% auto",
-          letterSpacing: '-2px'
-        }}
-      >
+      <h1 style={{ fontSize: '5rem' }} className="mb-5 bg-gradient-to-r from-[var(--yellow-accent)] via-[#FFE57F] to-[var(--yellow-accent)] bg-[length:200%_auto] bg-clip-text text-transparent">
         PennyPress
       </h1>
-
-      {/* CONTAINER: Uses Bootstrap Flexbox instead of Tailwind Grid */}
       <div className="d-flex flex-column flex-md-row gap-4 w-100" style={{ maxWidth: '800px' }}>
 
-        {/* Creator Path */}
         <Link href="/creator" className="flex-fill text-decoration-none group">
           <div
             className="card h-100 p-5 text-center transition-all position-relative overflow-hidden"
@@ -31,7 +19,6 @@ export default function Home() {
               transition: 'transform 0.3s ease, border-color 0.3s ease'
             }}
           >
-            {/* HOVER OVERLAY: Explicit CSS makes this reliable */}
             <div 
               className="position-absolute top-0 start-0 w-100 h-100" 
               style={{
@@ -39,7 +26,6 @@ export default function Home() {
                 opacity: 0,
                 transition: 'opacity 0.3s ease'
               }}
-              // This inline style trick forces the hover effect without complex CSS classes
               onMouseEnter={(e) => e.currentTarget.style.opacity = '0.05'}
               onMouseLeave={(e) => e.currentTarget.style.opacity = '0'}
             ></div>
@@ -55,7 +41,6 @@ export default function Home() {
           </div>
         </Link>
 
-        {/* Reader Path */}
         <Link href="/reader" className="flex-fill text-decoration-none group">
           <div
             className="card h-100 p-5 text-center transition-all position-relative overflow-hidden"
@@ -64,7 +49,7 @@ export default function Home() {
               transition: 'transform 0.3s ease, border-color 0.3s ease'
             }}
           >
-            {/* HOVER OVERLAY */}
+
             <div 
               className="position-absolute top-0 start-0 w-100 h-100" 
               style={{
@@ -88,7 +73,6 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* CSS Helper for the Text Hover Effect */}
       <style jsx global>{`
         .group:hover h2 {
           color: var(--yellow-accent) !important;
@@ -98,6 +82,7 @@ export default function Home() {
           border-color: var(--yellow-accent) !important;
         }
       `}</style>
+      <h3 className="mt-5 bg-gradient-to-r from-[var(--yellow-accent)] via-[#FFE57F] to-[var(--yellow-accent)] bg-[length:200%_auto] bg-clip-text text-transparent tracking-[-2px]"> 1 ETH = 10,000 PennyPress Tokens </h3>
     </main>
   );
 }

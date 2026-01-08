@@ -4,20 +4,24 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    // THEME UPDATE: Use new navy card color and border
-    <header className="w-full border-b" style={{ backgroundColor: 'var(--navy-card)', borderColor: 'var(--navy-border)' }}>
+    <header className="w-full border-b" style={{ backgroundColor: '#070d1d', borderColor: 'var(--navy-border)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Logo Section */}
-          <div className="flex items-center">
-            <Link href="/" className="no-underline">
-              <h1 className="text-2xl font-bold text-white hover:text-accent transition-colors">
+          <div className="flex-shrink-0 flex items-center">
+            <Link href="/" className="flex items-center gap-3">
+              <img 
+                src="/Logo.jpeg" 
+                alt="PennyPress Logo"
+                className="object-cover"
+                style={{ width: '300px', height: '100px' }}
+              />
+              <span className="font-bold text-xl text-white tracking-tight hidden md:block">
                 PennyPress
-              </h1>
+              </span>
             </Link>
           </div>
-
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
             <a

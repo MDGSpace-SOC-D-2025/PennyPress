@@ -6,7 +6,7 @@ dataSources:
     name: PennyPress
     network: zksync-era-sepolia
     source:
-      address: "0xD3dfbA35e02447418C544d488eFE01a6F719Fc33"
+      address: "0xe08DFBC138fa8D18803C79eC852Cc71d87aB6800"
       abi: PennyPress
       startBlock: 6290900
     mapping:
