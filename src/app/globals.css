@@ -1,84 +1,31 @@
-/* 1. TAILWIND IMPORTS */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* 2. THEME CONFIGURATION */
+@import "tailwindcss";
+@source "../components";
+@source "../app";
+/* 1. Define variables in :root so standard CSS and inline styles can see them */
 :root {
-  /* --- NEW COLOR PALETTE --- */
-  --navy-bg: #0A192F;       /* Deep Dark Blue Background */
-  --navy-card: #112240;     /* Slightly Lighter Blue for Cards */
-  --navy-border: #1D3557;   /* Subtle Blue Border */
-  --yellow-accent: #FFD700; /* Vibrant Yellow from image */
-  --text-off-white: #E6F1FF; /* Soft White Text */
-  --text-muted: #8892b0;    /* Muted Blue-Grey Text */
-
-  /* --- BOOTSTRAP OVERRIDES --- */
-  /* Map Bootstrap's 'primary' to our new Yellow */
-  --bs-primary: var(--yellow-accent);
-  --bs-primary-rgb: 255, 215, 0;
-
-  /* Map Bootstrap's background and text to our new theme */
-  --bs-body-bg: var(--navy-bg);
-  --bs-body-color: var(--text-off-white);
+  --navy-bg: #0A192F;
+  --navy-card: #112240;
+  --navy-border: #1D3557;
+  --yellow-accent: #FFD700;
+  --text-off-white: #E6F1FF;
+  --text-muted: #8892b0;
 }
 
-/* 3. GLOBAL RESET */
-html, body {
-  background-color: var(--navy-bg) !important;
-  color: var(--text-off-white) !important;
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
+/* 2. Map them to Tailwind v4 utilities so you can use 'bg-navy-bg' etc. */
+@theme {
+  --color-navy-bg: var(--navy-bg);
+  --color-navy-card: var(--navy-card);
+  --color-navy-border: var(--navy-border);
+  --color-yellow-accent: var(--yellow-accent);
+  --color-text-off-white: var(--text-off-white);
+  --color-text-muted: var(--text-muted);
+  
+  --font-sans: 'Inter', sans-serif;
 }
 
-/* 4. COMPONENT STYLES */
-
-/* The Card: Navy Blue with Subtle Border */
-.card {
-  background-color: var(--navy-card) !important;
-  border: 1px solid var(--navy-border) !important;
-  border-radius: 16px !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3); /* Softer shadow for dark mode */
-  overflow: hidden;
-}
-
-/* The Button: Yellow Pill */
-.btn-primary {
-  background-color: var(--yellow-accent) !important;
-  border-color: var(--yellow-accent) !important;
-  color: var(--navy-bg) !important; /* Dark text on Yellow for contrast */
-  font-weight: 800;
-  border-radius: 50px !important;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 10px 0;
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  background-color: #e6c200 !important; /* Slightly darker yellow on hover */
-  border-color: #e6c200 !important;
-  transform: scale(1.02);
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); /* Yellow Glow */
-}
-
-/* Outline Buttons (e.g., for the upload step) */
-.btn-outline-primary {
-    color: var(--yellow-accent) !important;
-    border-color: var(--yellow-accent) !important;
-}
-.btn-outline-primary:hover {
-    background-color: var(--yellow-accent) !important;
-    color: var(--navy-bg) !important;
-}
-
-/* Custom Text Utilities */
-.text-accent {
-  color: var(--yellow-accent) !important;
-}
-
-.text-muted-blue {
-  color: var(--text-muted) !important;
+/* 3. Force the dark theme on the body */
+body {
+  background-color: var(--navy-bg);
+  color: var(--text-off-white);
+  min-height: 100vh;
 }

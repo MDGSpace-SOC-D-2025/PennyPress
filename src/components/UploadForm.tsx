@@ -8,7 +8,7 @@ import { PENNYPRESS_ABI, CONTRACT_ADDRESS } from "@/constants";
 export default function UploadForm() {
   const { address } = useAccount();
   
-  // --- STATE ---
+
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -17,23 +17,22 @@ export default function UploadForm() {
   const [status, setStatus] = useState("");
   const [ipfsCid, setIpfsCid] = useState("");
 
-  // --- BLOCKCHAIN HOOKS ---
+
   const { data: hash, writeContract, isPending } = useWriteContract();
   
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   });
 
-  // --- LOGIC 1: IPFS UPLOAD ---
+
   const handleUploadToIPFS = async () => {
     if (!file) return;
     setStatus("Encrypting & Uploading...");
 
     try {
-      // 1. Encrypt the file using Lit Protocol
+     
       const encryptedData = await lit.encryptFile(file);
       
-      // 2. Prepare the bundle
       const contentBundle = JSON.stringify({
         title,          
         description,    
@@ -43,7 +42,6 @@ export default function UploadForm() {
         fileType: file.type 
       });
 
-      // 3. Upload to IPFS via your API route
       const blob = new Blob([contentBundle], { type: 'application/json' });
       const formData = new FormData();
       formData.append("file", blob, "content.json");
@@ -61,11 +59,9 @@ export default function UploadForm() {
     }
   };
 
-  // --- LOGIC 2: BLOCKCHAIN REGISTER ---
   const handleRegister = () => {
     if (!ipfsCid || !title) return;
 
-    // Create unique ID from the IPFS CID
     const articleId = keccak256(stringToHex(ipfsCid));
 
     writeContract({
@@ -76,98 +72,95 @@ export default function UploadForm() {
     });
   };
 
-  // --- STYLES ---
-  const inputStyles = {
-    backgroundColor: 'var(--navy-bg)',
-    color: 'var(--text-off-white)',
-    borderColor: 'var(--navy-border)',
-    borderRadius: '8px',
-    padding: '12px'
-  };
-
-  // --- RENDER ---
   return (
-    <div className="card w-100 p-4 shadow-lg" style={{maxWidth: '600px'}}>
-
-      {/* SECTION 1: Details */}
-      <div className="mb-4">
-        <div className="mb-3">
-          <label className="text-accent text-uppercase small fw-bold mb-1" style={{letterSpacing: '1px'}}>Title</label>
+    <div className="w-full max-w-2xl bg-navy-card border border-navy-border rounded-2xl p-8 shadow-2xl"> 
+      <div className="space-y-6 mb-8">
+        <div>
+          <label className="block text-xs font-bold text-yellow-accent uppercase tracking-wider mb-2">
+            Title
+          </label>
           <input 
             type="text" 
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="form-control"
-            style={inputStyles}
+            className="w-full bg-navy-bg border border-navy-border text-text-off-white rounded-lg p-3 focus:outline-none focus:border-yellow-accent transition-colors"
             placeholder="e.g., The Future of AI"
           />
         </div>
-        
-        <div className="mb-3">
-          <label className="text-accent text-uppercase small fw-bold mb-1" style={{letterSpacing: '1px'}}>Description</label>
+        <div>
+          <label className="block text-xs font-bold text-yellow-accent uppercase tracking-wider mb-2">
+            Description
+          </label>
           <textarea 
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="form-control"
-            style={{ ...inputStyles, height: '100px' }}
+            className="w-full bg-navy-bg border border-navy-border text-text-off-white rounded-lg p-3 h-32 focus:outline-none focus:border-yellow-accent transition-colors resize-none"
             placeholder="A short summary..."
           />
         </div>
 
-        <div className="row g-3">
-          <div className="col-6">
-             <label className="text-accent text-uppercase small fw-bold mb-1" style={{letterSpacing: '1px'}}>Price (ETH)</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+             <label className="block text-xs font-bold text-yellow-accent uppercase tracking-wider mb-2">
+               Price (ETH)
+             </label>
              <input 
                type="number" 
                step="0.001" 
                value={price}
                onChange={(e) => setPrice(e.target.value)}
-               className="form-control"
-               style={inputStyles}
+               className="w-full bg-navy-bg border border-navy-border text-text-off-white rounded-lg p-3 focus:outline-none focus:border-yellow-accent transition-colors"
              />
           </div>
-          <div className="col-6">
-            <label className="text-accent text-uppercase small fw-bold mb-1" style={{letterSpacing: '1px'}}>File</label>
+          <div>
+            <label className="block text-xs font-bold text-yellow-accent uppercase tracking-wider mb-2">
+              File (PDF)
+            </label>
             <input 
               type="file" 
               onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="form-control"
-              style={{ ...inputStyles, padding: '9px' }}
+              className="w-full text-sm text-text-muted
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-xs file:font-bold
+                file:bg-navy-bg file:text-yellow-accent
+                file:border-solid file:border file:border-yellow-accent
+                hover:file:bg-yellow-accent hover:file:text-navy-bg
+                cursor-pointer transition-all"
             />
           </div>
         </div>
       </div>
 
-      {/* SECTION 2: Actions */}
-      <div className="d-flex flex-column gap-3">
-        {/* Button A: Upload to IPFS */}
+      <div className="flex flex-col gap-4">
         <button 
           onClick={handleUploadToIPFS}
           disabled={!file || !!ipfsCid || status.includes("Encrypting")}
-          className={`btn ${ipfsCid ? 'btn-success' : 'btn-outline-primary'} w-100 py-3 fw-bold`}
-          style={{ borderRadius: '12px', textTransform: 'uppercase' }}
+          className={`w-full py-3 rounded-full font-bold uppercase tracking-wider transition-all duration-300
+            ${ipfsCid 
+              ? 'bg-green-500/10 text-green-400 border border-green-500 cursor-default' 
+              : 'border border-yellow-accent text-yellow-accent hover:bg-yellow-accent hover:text-navy-bg'
+            }
+            ${(!file) && 'opacity-50 cursor-not-allowed'}
+          `}
         >
           {ipfsCid ? "✓ File Encrypted & Uploaded" : status || "1. Upload & Encrypt"}
         </button>
 
-        {/* Button B: Register on Chain */}
         {ipfsCid && (
           <button 
             onClick={handleRegister}
             disabled={isPending || isConfirming || isConfirmed}
-            className="btn btn-primary w-100 py-3 fw-bold"
-            style={{ borderRadius: '12px', textTransform: 'uppercase', boxShadow: '0 0 15px rgba(255, 215, 0, 0.3)' }}
+            className="w-full py-4 bg-yellow-accent text-navy-bg font-extrabold rounded-full uppercase tracking-wider shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isPending ? "Check Wallet..." : isConfirming ? "Confirming..." : isConfirmed ? "Published! 🎉" : "2. Publish to Blockchain"}
           </button>
         )}
       </div>
-
-      {/* Confirmation Link */}
       {isConfirmed && (
-        <div className="mt-4 p-3 border border-success rounded text-center" style={{ backgroundColor: 'rgba(25, 135, 84, 0.1)' }}>
-          <p className="text-success fw-bold mb-1">Success! Article Registered.</p>
-          <p className="small text-muted-blue mb-0">Tx: {hash?.slice(0,10)}...</p>
+        <div className="mt-6 p-4 bg-green-500/10 border border-green-500 rounded-xl text-center">
+          <p className="text-green-400 font-bold mb-1">Success! Article Registered.</p>
+          <p className="text-xs text-text-muted font-mono">Tx: {hash?.slice(0,10)}...</p>
         </div>
       )}
     </div>

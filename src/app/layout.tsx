@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import "./globals.css";
 import { type ReactNode } from "react";
 import { Providers } from "./providers";
-import Header from "@/components/Header"
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "PennyPress",
+  description: "Decentralized Content Marketplace",
 };
 
-export default function RootLayout(props:  { children: ReactNode }) {
+export default function RootLayout(props: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-[#121212] text-white">
+      <body>
         <Providers>
-          <Header/>
+          <Header />
           {props.children}
         </Providers>
       </body>
