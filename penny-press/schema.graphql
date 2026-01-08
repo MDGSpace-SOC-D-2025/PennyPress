@@ -3,7 +3,7 @@ type Article @entity {
   ipfsCid: String!
   price: BigInt!
   creator: Bytes!
-  ownerCount: Int!
   createdAt: BigInt!
   totalStaked: BigInt!
+  reads: BigInt!
 }

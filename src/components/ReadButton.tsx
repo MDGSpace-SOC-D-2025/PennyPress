@@ -112,7 +112,7 @@ export default function ReadButton({ articleId, price, ipfsCid, creator }: ReadB
             color: '#fff' 
         }}
       >
-        🔓 Read Now {isCreator && "(Creator)"}
+         Read Now {isCreator && "(Creator)"}
       </button>
     );
   }

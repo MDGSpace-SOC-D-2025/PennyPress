@@ -89,19 +89,6 @@ export class Article extends Entity {
     this.set("creator", Value.fromBytes(value));
   }
 
-  get ownerCount(): i32 {
-    let value = this.get("ownerCount");
-    if (!value || value.kind == ValueKind.NULL) {
-      return 0;
-    } else {
-      return value.toI32();
-    }
-  }
-
-  set ownerCount(value: i32) {
-    this.set("ownerCount", Value.fromI32(value));
-  }
-
   get createdAt(): BigInt {
     let value = this.get("createdAt");
     if (!value || value.kind == ValueKind.NULL) {
@@ -126,5 +113,18 @@ export class Article extends Entity {
 
   set totalStaked(value: BigInt) {
     this.set("totalStaked", Value.fromBigInt(value));
+  }
+
+  get reads(): BigInt {
+    let value = this.get("reads");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set reads(value: BigInt) {
+    this.set("reads", Value.fromBigInt(value));
   }
 }

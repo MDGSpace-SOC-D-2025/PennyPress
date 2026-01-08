@@ -66,7 +66,6 @@ export default function StakeButton({ articleId }: StakeButtonProps) {
             autoFocus
           />
         </div>
-        
         <div className="d-flex gap-2">
           <button
             onClick={handleStake}
@@ -92,7 +91,7 @@ export default function StakeButton({ articleId }: StakeButtonProps) {
       className="btn btn-primary w-100 shadow-sm fw-bold"
       style={{ backgroundColor: '#6c5ce7', borderColor: '#6c5ce7' }} 
     >
-      🔥 Stake ETH
+      Stake ETH
     </button>
   );
 }
