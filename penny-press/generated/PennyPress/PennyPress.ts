@@ -84,6 +84,32 @@ export class OwnershipTransferred__Params {
   }
 }
 
+export class RewardClaimed extends ethereum.Event {
+  get params(): RewardClaimed__Params {
+    return new RewardClaimed__Params(this);
+  }
+}
+
+export class RewardClaimed__Params {
+  _event: RewardClaimed;
+
+  constructor(event: RewardClaimed) {
+    this._event = event;
+  }
+
+  get articleId(): Bytes {
+    return this._event.parameters[0].value.toBytes();
+  }
+
+  get staker(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get amount(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+}
+
 export class Staked extends ethereum.Event {
   get params(): Staked__Params {
     return new Staked__Params(this);
@@ -110,78 +136,149 @@ export class Staked__Params {
   }
 }
 
+export class Unstaked extends ethereum.Event {
+  get params(): Unstaked__Params {
+    return new Unstaked__Params(this);
+  }
+}
+
+export class Unstaked__Params {
+  _event: Unstaked;
+
+  constructor(event: Unstaked) {
+    this._event = event;
+  }
+
+  get articleId(): Bytes {
+    return this._event.parameters[0].value.toBytes();
+  }
+
+  get staker(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get amount(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+}
+
+export class PennyPress__articlesResult {
+  value0: BigInt;
+  value1: Address;
+  value2: BigInt;
+  value3: BigInt;
+  value4: boolean;
+
+  constructor(
+    value0: BigInt,
+    value1: Address,
+    value2: BigInt,
+    value3: BigInt,
+    value4: boolean,
+  ) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+    this.value4 = value4;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromAddress(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
+    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
+    map.set("value4", ethereum.Value.fromBoolean(this.value4));
+    return map;
+  }
+
+  getPrice(): BigInt {
+    return this.value0;
+  }
+
+  getCreator(): Address {
+    return this.value1;
+  }
+
+  getTotalStaked(): BigInt {
+    return this.value2;
+  }
+
+  getAccRewardsPerShare(): BigInt {
+    return this.value3;
+  }
+
+  getExists(): boolean {
+    return this.value4;
+  }
+}
+
+export class PennyPress__userInfoResult {
+  value0: BigInt;
+  value1: BigInt;
+
+  constructor(value0: BigInt, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+
+  getAmount(): BigInt {
+    return this.value0;
+  }
+
+  getRewardDebt(): BigInt {
+    return this.value1;
+  }
+}
+
 export class PennyPress extends ethereum.SmartContract {
   static bind(address: Address): PennyPress {
     return new PennyPress("PennyPress", address);
   }
 
-  articleCreators(param0: Bytes): Address {
+  articles(param0: Bytes): PennyPress__articlesResult {
     let result = super.call(
-      "articleCreators",
-      "articleCreators(bytes32):(address)",
+      "articles",
+      "articles(bytes32):(uint256,address,uint256,uint256,bool)",
       [ethereum.Value.fromFixedBytes(param0)],
     );
 
-    return result[0].toAddress();
+    return new PennyPress__articlesResult(
+      result[0].toBigInt(),
+      result[1].toAddress(),
+      result[2].toBigInt(),
+      result[3].toBigInt(),
+      result[4].toBoolean(),
+    );
   }
 
-  try_articleCreators(param0: Bytes): ethereum.CallResult<Address> {
+  try_articles(param0: Bytes): ethereum.CallResult<PennyPress__articlesResult> {
     let result = super.tryCall(
-      "articleCreators",
-      "articleCreators(bytes32):(address)",
+      "articles",
+      "articles(bytes32):(uint256,address,uint256,uint256,bool)",
       [ethereum.Value.fromFixedBytes(param0)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  articlePrices(param0: Bytes): BigInt {
-    let result = super.call(
-      "articlePrices",
-      "articlePrices(bytes32):(uint256)",
-      [ethereum.Value.fromFixedBytes(param0)],
+    return ethereum.CallResult.fromValue(
+      new PennyPress__articlesResult(
+        value[0].toBigInt(),
+        value[1].toAddress(),
+        value[2].toBigInt(),
+        value[3].toBigInt(),
+        value[4].toBoolean(),
+      ),
     );
-
-    return result[0].toBigInt();
-  }
-
-  try_articlePrices(param0: Bytes): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "articlePrices",
-      "articlePrices(bytes32):(uint256)",
-      [ethereum.Value.fromFixedBytes(param0)],
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  articleRewardPool(param0: Bytes): BigInt {
-    let result = super.call(
-      "articleRewardPool",
-      "articleRewardPool(bytes32):(uint256)",
-      [ethereum.Value.fromFixedBytes(param0)],
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_articleRewardPool(param0: Bytes): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "articleRewardPool",
-      "articleRewardPool(bytes32):(uint256)",
-      [ethereum.Value.fromFixedBytes(param0)],
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   checkAccess(articleId: Bytes, user: Address): boolean {
@@ -262,6 +359,38 @@ export class PennyPress extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  getPendingRewards(articleId: Bytes, _user: Address): BigInt {
+    let result = super.call(
+      "getPendingRewards",
+      "getPendingRewards(bytes32,address):(uint256)",
+      [
+        ethereum.Value.fromFixedBytes(articleId),
+        ethereum.Value.fromAddress(_user),
+      ],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getPendingRewards(
+    articleId: Bytes,
+    _user: Address,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getPendingRewards",
+      "getPendingRewards(bytes32,address):(uint256)",
+      [
+        ethereum.Value.fromFixedBytes(articleId),
+        ethereum.Value.fromAddress(_user),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   hasAccess(param0: Bytes, param1: Address): boolean {
     let result = super.call("hasAccess", "hasAccess(bytes32,address):(bool)", [
       ethereum.Value.fromFixedBytes(param0),
@@ -325,29 +454,6 @@ export class PennyPress extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  totalStakedOnArticle(param0: Bytes): BigInt {
-    let result = super.call(
-      "totalStakedOnArticle",
-      "totalStakedOnArticle(bytes32):(uint256)",
-      [ethereum.Value.fromFixedBytes(param0)],
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_totalStakedOnArticle(param0: Bytes): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "totalStakedOnArticle",
-      "totalStakedOnArticle(bytes32):(uint256)",
-      [ethereum.Value.fromFixedBytes(param0)],
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   treasuryBalance(): BigInt {
     let result = super.call(
       "treasuryBalance",
@@ -371,23 +477,29 @@ export class PennyPress extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  userStakes(param0: Bytes, param1: Address): BigInt {
+  userInfo(param0: Bytes, param1: Address): PennyPress__userInfoResult {
     let result = super.call(
-      "userStakes",
-      "userStakes(bytes32,address):(uint256)",
+      "userInfo",
+      "userInfo(bytes32,address):(uint256,uint256)",
       [
         ethereum.Value.fromFixedBytes(param0),
         ethereum.Value.fromAddress(param1),
       ],
     );
 
-    return result[0].toBigInt();
+    return new PennyPress__userInfoResult(
+      result[0].toBigInt(),
+      result[1].toBigInt(),
+    );
   }
 
-  try_userStakes(param0: Bytes, param1: Address): ethereum.CallResult<BigInt> {
+  try_userInfo(
+    param0: Bytes,
+    param1: Address,
+  ): ethereum.CallResult<PennyPress__userInfoResult> {
     let result = super.tryCall(
-      "userStakes",
-      "userStakes(bytes32,address):(uint256)",
+      "userInfo",
+      "userInfo(bytes32,address):(uint256,uint256)",
       [
         ethereum.Value.fromFixedBytes(param0),
         ethereum.Value.fromAddress(param1),
@@ -397,7 +509,9 @@ export class PennyPress extends ethereum.SmartContract {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(
+      new PennyPress__userInfoResult(value[0].toBigInt(), value[1].toBigInt()),
+    );
   }
 }
 
@@ -633,6 +747,36 @@ export class TransferOwnershipCall__Outputs {
   _call: TransferOwnershipCall;
 
   constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class UnstakeCall extends ethereum.Call {
+  get inputs(): UnstakeCall__Inputs {
+    return new UnstakeCall__Inputs(this);
+  }
+
+  get outputs(): UnstakeCall__Outputs {
+    return new UnstakeCall__Outputs(this);
+  }
+}
+
+export class UnstakeCall__Inputs {
+  _call: UnstakeCall;
+
+  constructor(call: UnstakeCall) {
+    this._call = call;
+  }
+
+  get articleId(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+}
+
+export class UnstakeCall__Outputs {
+  _call: UnstakeCall;
+
+  constructor(call: UnstakeCall) {
     this._call = call;
   }
 }

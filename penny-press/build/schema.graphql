@@ -6,4 +6,34 @@ type Article @entity {
   createdAt: BigInt!
   totalStaked: BigInt!
   reads: BigInt!
+  creatorUser: User
+  
+  # Relationships
+  stakes: [Stake!]! @derivedFrom(field: "article")
+  purchases: [Purchase!]! @derivedFrom(field: "article")
+}
+
+type User @entity {
+  id: Bytes!                     # Wallet Address
+  totalRevenue: BigInt!          # Total rewards claimed
+  totalStaked: BigInt!           # Total currently staked across all articles
+  
+  # Relationships
+  articlesCreated: [Article!]! @derivedFrom(field: "creatorUser")
+  stakes: [Stake!]! @derivedFrom(field: "user")
+  purchases: [Purchase!]! @derivedFrom(field: "user")
+}
+
+type Stake @entity {
+  id: ID!                        # Set as "userAddress-articleId"
+  user: User!
+  article: Article!
+  amount: BigInt!                # How much is currently staked
+}
+
+type Purchase @entity {
+  id: ID!                        # Set as transaction hash
+  user: User!
+  article: Article!
+  timestamp: BigInt!
 }
