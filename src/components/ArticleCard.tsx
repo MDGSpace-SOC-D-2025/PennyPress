@@ -7,7 +7,6 @@ import { ArticleData } from "./ArticleReader";
 const ArticleCard = ({ article }: { article: ArticleData }) => {
   return (
     <div className="flex flex-col h-full bg-navy-card border border-navy-border rounded-2xl p-6 shadow-lg transition-all duration-300 hover:translate-y-[-4px] hover:border-yellow-accent/50">
-      
       <div className="flex justify-between items-center mb-4">
         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-navy-bg text-text-muted border border-navy-border">
           {formatEther(BigInt(article.totalStaked) * BigInt(10000))} PT Staked
@@ -16,7 +15,6 @@ const ArticleCard = ({ article }: { article: ArticleData }) => {
           {formatEther(BigInt(article.price) * BigInt(10000))} PT
         </span>
       </div>
-
 
       <h4 className="text-xl font-bold text-white mb-2 leading-tight">
           {article.title}

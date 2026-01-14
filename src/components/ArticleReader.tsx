@@ -67,7 +67,7 @@ export const loadArticles = async (
       break;
   }
 
-  try {
+  try { 
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

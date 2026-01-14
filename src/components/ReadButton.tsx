@@ -51,7 +51,7 @@ export default function ReadButton({ articleId, price, ipfsCid, creator }: ReadB
       value: parseEther(price),
     });
   };
-  
+
   const handleRead = async () => {
     setStatus("Fetching encrypted data...");
     try {

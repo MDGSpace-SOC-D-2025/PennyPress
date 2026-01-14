@@ -3,8 +3,6 @@ import UploadForm from "@/components/UploadForm";
 export default function CreatorPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-4 relative">
-      
-      {/* Optional Background Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-yellow-accent opacity-[0.02] blur-[120px] pointer-events-none rounded-full"></div>
 
       <div className="text-center mb-10 relative z-10">

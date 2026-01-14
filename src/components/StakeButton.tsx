@@ -84,8 +84,7 @@ export default function StakeButton({ articleId }: StakeButtonProps) {
       </div>
     );
   }
-
-
+  
   return (
     <button 
       onClick={() => setShowInput(true)} 
