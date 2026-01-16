@@ -16,7 +16,7 @@ type Article @entity {
 type User @entity {
   id: Bytes!                     # Wallet Address
   totalRevenue: BigInt!          # Total rewards claimed
-  totalStaked: BigInt!           # Total currently staked across all articles
+  totalStaked: BigInt!           # Total currently staked across all articles   
   
   # Relationships
   articlesCreated: [Article!]! @derivedFrom(field: "creatorUser")

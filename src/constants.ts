@@ -8,7 +8,7 @@ export const PENNYPRESS_ABI = [
         },
         {
             "type": "function",
-            "name": "articleCreators",
+            "name": "articles",
             "inputs": [
                 {
                     "name": "",
@@ -18,47 +18,29 @@ export const PENNYPRESS_ABI = [
             ],
             "outputs": [
                 {
-                    "name": "",
+                    "name": "price",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "creator",
                     "type": "address",
                     "internalType": "address"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "articlePrices",
-            "inputs": [
+                },
                 {
-                    "name": "",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "",
+                    "name": "totalStaked",
                     "type": "uint256",
                     "internalType": "uint256"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "articleRewardPool",
-            "inputs": [
+                },
                 {
-                    "name": "",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "",
+                    "name": "accRewardsPerShare",
                     "type": "uint256",
                     "internalType": "uint256"
+                },
+                {
+                    "name": "exists",
+                    "type": "bool",
+                    "internalType": "bool"
                 }
             ],
             "stateMutability": "view"
@@ -144,6 +126,30 @@ export const PENNYPRESS_ABI = [
             "inputs": [],
             "outputs": [],
             "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "getPendingRewards",
+            "inputs": [
+                {
+                    "name": "articleId",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                },
+                {
+                    "name": "_user",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
         },
         {
             "type": "function",
@@ -259,25 +265,6 @@ export const PENNYPRESS_ABI = [
         },
         {
             "type": "function",
-            "name": "totalStakedOnArticle",
-            "inputs": [
-                {
-                    "name": "",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
             "name": "transferOwnership",
             "inputs": [
                 {
@@ -304,7 +291,20 @@ export const PENNYPRESS_ABI = [
         },
         {
             "type": "function",
-            "name": "userStakes",
+            "name": "unstake",
+            "inputs": [
+                {
+                    "name": "articleId",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "userInfo",
             "inputs": [
                 {
                     "name": "",
@@ -319,7 +319,12 @@ export const PENNYPRESS_ABI = [
             ],
             "outputs": [
                 {
-                    "name": "",
+                    "name": "amount",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "rewardDebt",
                     "type": "uint256",
                     "internalType": "uint256"
                 }
@@ -397,7 +402,57 @@ export const PENNYPRESS_ABI = [
         },
         {
             "type": "event",
+            "name": "RewardClaimed",
+            "inputs": [
+                {
+                    "name": "articleId",
+                    "type": "bytes32",
+                    "indexed": true,
+                    "internalType": "bytes32"
+                },
+                {
+                    "name": "staker",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
             "name": "Staked",
+            "inputs": [
+                {
+                    "name": "articleId",
+                    "type": "bytes32",
+                    "indexed": true,
+                    "internalType": "bytes32"
+                },
+                {
+                    "name": "staker",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "Unstaked",
             "inputs": [
                 {
                     "name": "articleId",
@@ -447,4 +502,4 @@ export const PENNYPRESS_ABI = [
             "name": "ReentrancyGuardReentrantCall",
             "inputs": []
         }
-    ] as const;
+    ]  as const;
