@@ -8,7 +8,6 @@ import { formatEther } from "viem";
 import { Loader2, Feather, BookOpen, DollarSign, Ban, User } from "lucide-react";
 import Link from "next/link";
 
-
 export default function ProfilePage() {
   const { address, isConnected } = useAccount();
   const [profile, setProfile] = useState<UserProfile | null>(null);
