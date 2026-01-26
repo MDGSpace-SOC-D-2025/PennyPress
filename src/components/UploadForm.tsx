@@ -8,7 +8,6 @@ import { PENNYPRESS_ABI, CONTRACT_ADDRESS } from "@/constants";
 export default function UploadForm() {
   const { address } = useAccount();
   
-
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -16,7 +15,7 @@ export default function UploadForm() {
   
   const [status, setStatus] = useState("");
   const [ipfsCid, setIpfsCid] = useState("");
-
+  const [articleId, setArticleId] = useState<string>("");
 
   const { data: hash, writeContract, isPending } = useWriteContract();
   
@@ -24,15 +23,21 @@ export default function UploadForm() {
     hash,
   });
 
-
   const handleUploadToIPFS = async () => {
-    if (!file) return;
+    if (!file || !address) {
+      setStatus("Please connect wallet and select a file");
+      return;
+    }
+
     setStatus("Encrypting & Uploading...");
 
     try {
-     
-      const encryptedData = await lit.encryptFile(file);
+      const tempId = keccak256(stringToHex(file.name + Date.now()));
+      setArticleId(tempId);
       
+      const encryptedData = await lit.encryptFile(file, tempId, address);
+      
+      // Bundle encrypted content + metadata
       const contentBundle = JSON.stringify({
         title,          
         description,    
@@ -42,6 +47,7 @@ export default function UploadForm() {
         fileType: file.type 
       });
 
+      // Upload to IPFS via Pinata
       const blob = new Blob([contentBundle], { type: 'application/json' });
       const formData = new FormData();
       formData.append("file", blob, "content.json");
@@ -51,24 +57,30 @@ export default function UploadForm() {
       const data = await response.json();
       
       setIpfsCid(data.IpfsHash);
+      
+      // Now regenerate articleId using the actual IPFS CID
+      const finalArticleId = keccak256(stringToHex(data.IpfsHash));
+      setArticleId(finalArticleId);
+      
       setStatus("IPFS Upload Complete! Ready to Register.");
       
     } catch (e) {
       console.error(e);
-      setStatus("Error during upload.");
+      setStatus("Error during upload: " + (e as Error).message);
     }
   };
 
   const handleRegister = () => {
-    if (!ipfsCid || !title) return;
-
-    const articleId = keccak256(stringToHex(ipfsCid));
+    if (!ipfsCid || !title || !articleId) {
+      setStatus("Missing required data");
+      return;
+    }
 
     writeContract({
       address: CONTRACT_ADDRESS,
       abi: PENNYPRESS_ABI,
       functionName: "registerArticle",
-      args: [articleId, parseEther(price), ipfsCid],
+      args: [articleId as `0x${string}`, parseEther(price), ipfsCid],
     });
   };
 
@@ -118,6 +130,7 @@ export default function UploadForm() {
             </label>
             <input 
               type="file" 
+              accept=".pdf"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
               className="w-full text-sm text-text-muted
                 file:mr-4 file:py-2 file:px-4
@@ -135,13 +148,13 @@ export default function UploadForm() {
       <div className="flex flex-col gap-4">
         <button 
           onClick={handleUploadToIPFS}
-          disabled={!file || !!ipfsCid || status.includes("Encrypting")}
+          disabled={!file || !address || !!ipfsCid || status.includes("Encrypting")}
           className={`w-full py-3 rounded-full font-bold uppercase tracking-wider transition-all duration-300
             ${ipfsCid 
               ? 'bg-green-500/10 text-green-400 border border-green-500 cursor-default' 
               : 'border border-yellow-accent text-yellow-accent hover:bg-yellow-accent hover:text-navy-bg'
             }
-            ${(!file) && 'opacity-50 cursor-not-allowed'}
+            ${(!file || !address) && 'opacity-50 cursor-not-allowed'}
           `}
         >
           {ipfsCid ? "✓ File Encrypted & Uploaded" : status || "1. Upload & Encrypt"}
@@ -157,10 +170,19 @@ export default function UploadForm() {
           </button>
         )}
       </div>
+      
       {isConfirmed && (
         <div className="mt-6 p-4 bg-green-500/10 border border-green-500 rounded-xl text-center">
           <p className="text-green-400 font-bold mb-1">Success! Article Registered.</p>
           <p className="text-xs text-text-muted font-mono">Tx: {hash?.slice(0,10)}...</p>
+          <p className="text-xs text-text-muted font-mono mt-1">Article ID: {articleId.slice(0,10)}...</p>
+        </div>
+      )}
+
+      {/* Wallet Not Connected Warning */}
+      {!address && (
+        <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500 rounded-xl text-center">
+          <p className="text-yellow-400 text-sm"> Please connect your wallet to upload articles</p>
         </div>
       )}
     </div>

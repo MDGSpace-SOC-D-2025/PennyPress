@@ -1,6 +1,7 @@
 import { LitNodeClient } from "@lit-protocol/lit-node-client";
 import { checkAndSignAuthMessage } from "@lit-protocol/auth-browser";
 import { encryptFile, decryptToFile } from "@lit-protocol/encryption";
+import { CONTRACT_ADDRESS } from "@/constants";
 
 class Lit {
   public litNodeClient: LitNodeClient | null = null;
@@ -19,7 +20,7 @@ class Lit {
   }
 
   // --- 1. ENCRYPTION (Write) ---
-  async encryptFile(file: File) {
+  async encryptFile(file: File, articleId: string, creatorAddress: string) {
     if (!this.litNodeClient) {
       await this.connect();
     }
@@ -29,17 +30,32 @@ class Lit {
       nonce: await this.litNodeClient!.getLatestBlockhash(),
     });
 
-    // Access Control: Allow anyone (for dev purposes)
     const accessControlConditions = [
       {
-        contractAddress: "",
+        // Condition 1: Check if caller is the article creator
+        contractAddress: CONTRACT_ADDRESS,
         standardContractType: "",
-        chain: this.chain,
-        method: "eth_getBalance",
-        parameters: [":userAddress", "latest"],
+        chain: "zkSyncTestnet", 
+        method: "articles",
+        parameters: [articleId], 
         returnValueTest: {
-          comparator: ">=",
-          value: "0",
+          comparator: "=",
+          value: ":userAddress", // Special Lit syntax for msg.sender
+          key: "creator" // Access the 'creator' field from the returned struct
+        },
+      },
+      {
+        operator: "or" 
+      },
+      {
+        contractAddress: CONTRACT_ADDRESS,
+        standardContractType: "",
+        chain: "zkSyncTestnet",
+        method: "hasAccess",
+        parameters: [articleId, ":userAddress"], 
+        returnValueTest: {
+          comparator: "=",
+          value: "true", 
         },
       },
     ];
@@ -61,7 +77,6 @@ class Lit {
     };
   }
 
-  // --- 2. DECRYPTION (Read) ---
   async decryptFile(
     ciphertext: string,
     dataToEncryptHash: string,
@@ -89,9 +104,12 @@ class Lit {
       this.litNodeClient!
     );
 
-    // FIX: Cast 'decryptedData' to 'any' to bypass the 'ArrayBufferLike' mismatch
+    // Convert ArrayBuffer to Blob with correct MIME type
     return new Blob([decryptedData as any], { type: fileType });
   }
+
 }
+
+
 
 export const lit = new Lit();
